@@ -24,14 +24,21 @@ class BlocCounterView extends StatelessWidget {
 BlocProvider.of<CounterBloc>(context).add(CounterIncreased(value));
   }// Se utiliza BlocProvider.of() para acceder al Bloc de forma organizada, segura y eficiente, siguiendo las mejores prácticas de inyección de dependencias y gestión del ciclo de vida.
 
+  void resetCounter(BuildContext context, [int value = 0]) {
+    BlocProvider.of<CounterBloc>(context).add(const CounterReseted());
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Bloc Counter'),
+        title:  context.select((CounterBloc transactionBloc)=> Text('Bloc Counter ${transactionBloc.state.transactionCount}')),
         actions: [
-          IconButton(onPressed: (){}, icon: const Icon(Icons.restart_alt_outlined)),
+          IconButton(onPressed: (){
+                resetCounter(context);
+          }, icon: const Icon(Icons.restart_alt_outlined)),
         ],
         ),
       body:  Center(
