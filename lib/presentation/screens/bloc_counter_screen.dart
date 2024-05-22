@@ -20,12 +20,16 @@ class BlocCounterView extends StatelessWidget {
   });
 
   void increaseCounterBy(BuildContext context, [int value = 1]) {
-    // context.read<CounterBloc>().add(CounterIncreased(value));
-BlocProvider.of<CounterBloc>(context).add(CounterIncreased(value));
-  }// Se utiliza BlocProvider.of() para acceder al Bloc de forma organizada, segura y eficiente, siguiendo las mejores prácticas de inyección de dependencias y gestión del ciclo de vida.
+    // context.read<CounterBloc>().add(CounterIncreased(value));//--->Asi lo hizo Fernando
+// BlocProvider.of<CounterBloc>(context).add(CounterIncreased(value));
+BlocProvider.of<CounterBloc>(context).increaseCounterBy(value);//disparando el evento desde el bloc y no desde el boton
+  }
+  //NOTA: Se utiliza BlocProvider.of() para acceder al Bloc de forma organizada, segura y eficiente, siguiendo las mejores prácticas de inyección de dependencias y gestión del ciclo de vida.
 
   void resetCounter(BuildContext context, [int value = 0]) {
-    BlocProvider.of<CounterBloc>(context).add(const CounterReseted());
+    // BlocProvider.of<CounterBloc>(context).add(const CounterReseted());
+    BlocProvider.of<CounterBloc>(context).resetCounter();
+
   }
 
 

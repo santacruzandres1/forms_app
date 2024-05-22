@@ -23,4 +23,13 @@ class CounterBloc extends Bloc<CounterEvent, CounterState> {
         emit( CounterState(counter: 0, transactionCount: state.transactionCount),
         );
   }
+  void increaseCounterBy([int value = 1]){
+    add(CounterIncreased(value));
+  
+  }
+  void resetCounter([int value = 0]){
+    add(const CounterReseted());
+  }
 }
+
+  
