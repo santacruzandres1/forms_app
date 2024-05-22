@@ -9,8 +9,9 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: _HomeView(
+    return Scaffold(
+      appBar: AppBar(title: const Text('data'),),
+      body: const _HomeView(
         menuItems: appMenuItems,
       ),
     )
@@ -52,17 +53,45 @@ class _HomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: menuItems.length,
-      itemBuilder: (context, index) {
-        final listItem = menuItems[index];
-        return ListTile(
-          title: Text(listItem.title),
-          subtitle: Text(listItem.subtitle),
-          trailing: const Icon(Icons.arrow_forward_ios_outlined),
-          onTap: () => context.push(listItem.route),
-        );
-      },
+    return Column(
+      children: [
+        SizedBox(
+            child: Column(
+              children: [
+                ...menuItems.map(
+                  (e) => ListTile(
+                    title: Text(e.title),
+                    subtitle: Text(e.subtitle),
+                    trailing: const Icon(Icons.arrow_forward_ios_outlined),
+                    onTap: () => context.push(e.route),
+                  ),
+                )
+              ],
+            )
+            // ListView.builder(
+            //   itemCount: menuItems.length,
+            //   itemBuilder: (context, index) {
+            //     final listItem = menuItems[index];
+            //     return ListTile(
+            //       title: Text(listItem.title),
+            //       subtitle: Text(listItem.subtitle),
+            //       trailing: const Icon(Icons.arrow_forward_ios_outlined),
+            //       onTap: () => context.push(listItem.route),
+            //     );
+            //   },
+            // ),
+            ),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20),
+          child: Divider(),
+        ),
+        ListTile(
+          title: const Text('Nuevo Usuario'),
+          subtitle: const Text('Manejo de formularios'),
+          trailing: const Icon(Icons.arrow_forward_ios),
+          onTap: () => context.push('/new-user'),
+        )
+      ],
     );
   }
 }
