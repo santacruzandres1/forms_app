@@ -2,7 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:forms_app/presentation/blocs/register_bloc/register_bloc.dart';
+import 'package:forms_app/presentation/blocs/register_cubit/register_cubit.dart';
+
 import 'package:forms_app/widgets/widgets.dart';
 import 'package:go_router/go_router.dart';
 
@@ -11,13 +12,13 @@ class RegisterScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => RegisterBloc(),
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Nuevo Usuario'),
-        ),
-        body: const _RegisterView(),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Nuevo Usuario'),
+      ),
+      body: BlocProvider(
+        create: (context) => RegisterCubit(),
+        child: const _RegisterView(),
       ),
     );
   }
@@ -61,16 +62,10 @@ class _RegisterForm extends StatefulWidget {
 
 class _RegisterFormState extends State<_RegisterForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  String? firstName;
-  String? lastName;
-  String? email;
-  String? pass;
-  String? checkPass;
 
   @override
   Widget build(BuildContext context) {
-    final registerBloc = context.watch<RegisterBloc>();
-
+    final registerCubit = context.watch<RegisterCubit>();
     return Form(
       key: _formKey,
       child: Column(
@@ -78,8 +73,7 @@ class _RegisterFormState extends State<_RegisterForm> {
           CustomTextFormField(
             label: 'First Name',
             onChanged: (value) {
-              registerBloc.add(FirstNameChanged(value));
-
+              registerCubit.firstNameChanged(value);
               _formKey.currentState?.validate();
             },
             validator: (value) {
@@ -115,9 +109,7 @@ class _RegisterFormState extends State<_RegisterForm> {
               return null;
             },
             onChanged: (value) {
-              lastName = value;
-              registerBloc.add(LastNameChanged(value));
-
+              registerCubit.lastNameChanged(value);
               _formKey.currentState?.validate();
             },
           ),
@@ -127,8 +119,8 @@ class _RegisterFormState extends State<_RegisterForm> {
           CustomTextFormField(
             label: 'Email',
             hint: ' example@email.com',
-          onChanged: (value) {
-              registerBloc.add(EmailChanged(value));
+            onChanged: (value) {
+              registerCubit.emailChanged(value);
 
               _formKey.currentState?.validate();
             },
@@ -149,13 +141,12 @@ class _RegisterFormState extends State<_RegisterForm> {
           CustomTextFormField(
             label: 'Password',
             // obscureText: true,
-          onChanged: (value) {
-              registerBloc.add(PasswordChanged(value));
-
+            onChanged: (value) {
+              registerCubit.passwordChanged(value);
               _formKey.currentState?.validate();
             },
             validator: (value) {
-              pass=value;
+              // pass = value;
               final characterRegExp =
                   RegExp(r'.*[!@#$%^&*()_+\-=\[\]{};:\\|,.<>\/?]+');
               final lowerCaseRegExp = RegExp(r'[a-z]');
@@ -181,34 +172,48 @@ class _RegisterFormState extends State<_RegisterForm> {
             height: 10,
           ),
           CustomTextFormField(
-            label: 'Confirm your Password',
-            // obscureText: true,
+            label: 'Confirmar Contraseña',
             onChanged: (value) {
-              registerBloc.add(PasswordChanged(value));
-
+              // Llamamos al método del cubit para verificar si las contraseñas coinciden
+              registerCubit.checkPasswordMatch(
+                registerCubit.state.password,
+                value,
+              );
               _formKey.currentState?.validate();
             },
             validator: (value) {
-              if (value != pass) return 'Las contraseñas no coinciden';
+              // Validamos que las contraseñas coincidan
+              if (value != registerCubit.state.password) {
+                return 'Las contraseñas no coinciden';
+              }
               return null;
             },
           ),
-          SizedBox(
+            SizedBox(
             height: 20,
           ),
-          FilledButton.tonalIcon(
-            onPressed: () async {
-              final isValid = _formKey.currentState?.validate();
-              if (isValid!) {
-                await Future.delayed(Duration(
-                    milliseconds:
-                        100)); // Short delay to simulate an asynchronous operation
-                // ignore: use_build_context_synchronously
-                context.push('/user');
-              }
-            },
-            icon: Icon(Icons.save),
-            label: Text('Crear Usuario'),
+          if (!registerCubit.state.isPasswordMatching)
+            FilledButton.tonalIcon(
+              onPressed: null,
+              icon: Icon(Icons.save),
+              label: Text('Crear Usuario'),
+            )
+          else
+            FilledButton.tonalIcon(
+              onPressed: () {
+                final isValid = _formKey.currentState?.validate();
+                registerCubit.onSubmit();
+                if (isValid!) {
+                  Future.delayed(Duration(milliseconds: 100));
+                  context.push('/user');
+                }
+              },
+              icon: Icon(Icons.save),
+              label: Text('Crear Usuario'),
+            ),
+        
+          SizedBox(
+            height: 20,
           ),
         ],
       ),
