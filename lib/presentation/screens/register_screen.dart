@@ -1,6 +1,8 @@
 // ignore_for_file: prefer_const_constructors, curly_braces_in_flow_control_structures
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:forms_app/presentation/blocs/register_bloc/register_bloc.dart';
 import 'package:forms_app/widgets/widgets.dart';
 import 'package:go_router/go_router.dart';
 
@@ -9,11 +11,14 @@ class RegisterScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Nuevo Usuario'),
+    return BlocProvider(
+      create: (context) => RegisterBloc(),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Nuevo Usuario'),
+        ),
+        body: const _RegisterView(),
       ),
-      body: const _RegisterView(),
     );
   }
 }
@@ -64,22 +69,30 @@ class _RegisterFormState extends State<_RegisterForm> {
 
   @override
   Widget build(BuildContext context) {
+    final registerBloc = context.watch<RegisterBloc>();
+
     return Form(
       key: _formKey,
       child: Column(
         children: [
           CustomTextFormField(
             label: 'First Name',
-            onChanged: (value) => firstName = value,
+            onChanged: (value) {
+              registerBloc.add(FirstNameChanged(value));
+
+              _formKey.currentState?.validate();
+            },
             validator: (value) {
               final characterRegExp =
-                  RegExp(r'.*[!@#$%^&*()_+\-=\[\]{};:\\|,.<>\/?]+');
+                  RegExp(r'.*[!@#$%^&*()_+\-=\[\]{};:\\|,.<>\/?"]+');
               final numberCaseRegExp = RegExp(r'[0-9]');
-              if (value == null || value.isEmpty) return 'Campo requerido';
+              if (value == null) return 'Campo requerido';
               if (value.trim().isEmpty) return 'Campo requerido';
+              if (characterRegExp.hasMatch(value))
+                return 'Este campo no admite caracteres especiales';
+              if (numberCaseRegExp.hasMatch(value))
+                return 'Este campo no admite números';
               if (value.length < 6) return 'Más de 6 letras';
-              if (characterRegExp.hasMatch(value))return 'Este campo no admite caracteres especiales';
-              if (numberCaseRegExp.hasMatch(value))return 'Este campo no admite números';
               return null;
             },
           ),
@@ -89,12 +102,24 @@ class _RegisterFormState extends State<_RegisterForm> {
           CustomTextFormField(
             label: 'Last Name',
             validator: (value) {
-              if (value == null || value.isEmpty) return 'Campo requerido';
+              final characterRegExp =
+                  RegExp(r'.*[!@#$%^&*()_+\-=\[\]{};:\\|,.<>\/?]+');
+              final numberCaseRegExp = RegExp(r'[0-9]');
+              if (value == null) return 'Campo requerido';
               if (value.trim().isEmpty) return 'Campo requerido';
+              if (characterRegExp.hasMatch(value))
+                return 'Este campo no admite caracteres especiales';
+              if (numberCaseRegExp.hasMatch(value))
+                return 'Este campo no admite números';
               if (value.length < 6) return 'Más de 6 letras';
               return null;
             },
-            onChanged: (value) => lastName = value,
+            onChanged: (value) {
+              lastName = value;
+              registerBloc.add(LastNameChanged(value));
+
+              _formKey.currentState?.validate();
+            },
           ),
           SizedBox(
             height: 10,
@@ -102,7 +127,11 @@ class _RegisterFormState extends State<_RegisterForm> {
           CustomTextFormField(
             label: 'Email',
             hint: ' example@email.com',
-            onChanged: (value) => email = value,
+          onChanged: (value) {
+              registerBloc.add(EmailChanged(value));
+
+              _formKey.currentState?.validate();
+            },
             validator: (value) {
               final emailRegExp = RegExp(
                 r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
@@ -119,9 +148,14 @@ class _RegisterFormState extends State<_RegisterForm> {
           ),
           CustomTextFormField(
             label: 'Password',
-            obscureText: true,
-            onChanged: (value) => pass = value,
+            // obscureText: true,
+          onChanged: (value) {
+              registerBloc.add(PasswordChanged(value));
+
+              _formKey.currentState?.validate();
+            },
             validator: (value) {
+              pass=value;
               final characterRegExp =
                   RegExp(r'.*[!@#$%^&*()_+\-=\[\]{};:\\|,.<>\/?]+');
               final lowerCaseRegExp = RegExp(r'[a-z]');
@@ -148,8 +182,12 @@ class _RegisterFormState extends State<_RegisterForm> {
           ),
           CustomTextFormField(
             label: 'Confirm your Password',
-            obscureText: true,
-            onChanged: (value) => checkPass = value,
+            // obscureText: true,
+            onChanged: (value) {
+              registerBloc.add(PasswordChanged(value));
+
+              _formKey.currentState?.validate();
+            },
             validator: (value) {
               if (value != pass) return 'Las contraseñas no coinciden';
               return null;
