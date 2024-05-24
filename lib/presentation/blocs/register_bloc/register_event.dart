@@ -27,6 +27,6 @@ class EmailChanged extends RegisterFormEvent {
 }
 
 class PasswordChanged extends RegisterFormEvent {
-  final Pass password = const Pass.dirty();
+  final Password password = const Password.dirty();
   const PasswordChanged(String password);
 }

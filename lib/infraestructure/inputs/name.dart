@@ -16,6 +16,16 @@ class Name extends FormzInput<String, NameError> {
   NameError? validator(String value) {
     if (value.isEmpty || value.trim().isEmpty) return NameError.empty;
     if (value.length < 6) return NameError.length;
-    return value.isEmpty ? NameError.empty : null;
+    return null;
   }
 }
+//               final characterRegExp = RegExp(r'.*[!@#$%^&*()_+\-=\[\]{};:\\|,.<>\/?]+');
+//               final numberCaseRegExp = RegExp(r'[0-9]');
+//               if (value == null) return 'Campo requerido';
+//               if (value.trim().isEmpty) return 'Campo requerido';
+//               if (characterRegExp.hasMatch(value))
+//                 return 'Este campo no admite caracteres especiales';
+//               if (numberCaseRegExp.hasMatch(value))
+//                 return 'Este campo no admite números';
+//               if (value.length < 6) return 'Más de 6 letras';
+//               return null

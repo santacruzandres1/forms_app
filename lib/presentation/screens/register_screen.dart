@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:forms_app/presentation/blocs/register_cubit/register_cubit.dart';
 
 import 'package:forms_app/widgets/widgets.dart';
-import 'package:go_router/go_router.dart';
+// import 'package:go_router/go_router.dart';
 
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
@@ -53,29 +53,27 @@ class _RegisterView extends StatelessWidget {
   }
 }
 
-class _RegisterForm extends StatefulWidget {
+class _RegisterForm extends StatelessWidget {
   const _RegisterForm();
-
-  @override
-  State<_RegisterForm> createState() => _RegisterFormState();
-}
-
-class _RegisterFormState extends State<_RegisterForm> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     final registerCubit = context.watch<RegisterCubit>();
+    final firstName = registerCubit.state.firstName;
+    final password = registerCubit.state.password;
     return Form(
-      key: _formKey,
       child: Column(
         children: [
           CustomTextFormField(
             label: 'First Name',
-            onChanged: (value) {
-              registerCubit.firstNameChanged(value);
-              _formKey.currentState?.validate();
-            },
+            // onChanged: (value) {
+            //   registerCubit.firstNameChanged(value);
+            // },
+            onChanged: registerCubit.firstNameChanged, //tambien podemos hacer el onChanged de esta forma
+            errorMessage: firstName.isValid || firstName.isPure
+            ? 'Usuario No válido'
+            : null
+            ,
             validator: (value) {
               final characterRegExp =
                   RegExp(r'.*[!@#$%^&*()_+\-=\[\]{};:\\|,.<>\/?"]+');
@@ -110,7 +108,6 @@ class _RegisterFormState extends State<_RegisterForm> {
             },
             onChanged: (value) {
               registerCubit.lastNameChanged(value);
-              _formKey.currentState?.validate();
             },
           ),
           SizedBox(
@@ -121,8 +118,6 @@ class _RegisterFormState extends State<_RegisterForm> {
             hint: ' example@email.com',
             onChanged: (value) {
               registerCubit.emailChanged(value);
-
-              _formKey.currentState?.validate();
             },
             validator: (value) {
               final emailRegExp = RegExp(
@@ -143,7 +138,6 @@ class _RegisterFormState extends State<_RegisterForm> {
             // obscureText: true,
             onChanged: (value) {
               registerCubit.passwordChanged(value);
-              _formKey.currentState?.validate();
             },
             validator: (value) {
               // pass = value;
@@ -173,14 +167,14 @@ class _RegisterFormState extends State<_RegisterForm> {
           ),
           CustomTextFormField(
             label: 'Confirmar Contraseña',
-            onChanged: (value) {
-              // Llamamos al método del cubit para verificar si las contraseñas coinciden
-              registerCubit.checkPasswordMatch(
-                registerCubit.state.password,
-                value,
-              );
-              _formKey.currentState?.validate();
-            },
+            // onChanged: (value) {
+            //   // Llamamos al método del cubit para verificar si las contraseñas coinciden
+            //   registerCubit.checkPasswordMatch(
+            //     registerCubit.state.password,
+            //     value,
+            //   );
+            //   _formKey.currentState?.validate();
+            // },
             validator: (value) {
               // Validamos que las contraseñas coincidan
               if (value != registerCubit.state.password) {
@@ -192,22 +186,27 @@ class _RegisterFormState extends State<_RegisterForm> {
             SizedBox(
             height: 20,
           ),
-          if (!registerCubit.state.isPasswordMatching)
-            FilledButton.tonalIcon(
-              onPressed: null,
-              icon: Icon(Icons.save),
-              label: Text('Crear Usuario'),
-            )
-          else
-            FilledButton.tonalIcon(
-              onPressed: () {
-                final isValid = _formKey.currentState?.validate();
-                registerCubit.onSubmit();
-                if (isValid!) {
-                  Future.delayed(Duration(milliseconds: 100));
-                  context.push('/user');
-                }
-              },
+          // if (!registerCubit.state.isPasswordMatching)
+          //   FilledButton.tonalIcon(
+          //     onPressed: null,
+          //     icon: Icon(Icons.save),
+          //     label: Text('Crear Usuario'),
+          //   )
+          // else
+          //   FilledButton.tonalIcon(
+          //     onPressed: () {
+          //       final isValid = _formKey.currentState?.validate();
+          //       registerCubit.onSubmit();
+          //       if (isValid!) {
+          //         Future.delayed(Duration(milliseconds: 100));
+          //         context.push('/user');
+          //       }
+          //     },
+          //     icon: Icon(Icons.save),
+          //     label: Text('Crear Usuario'),
+          //   ),
+          FilledButton.tonalIcon(
+              onPressed: () => registerCubit.onSubmit(),
               icon: Icon(Icons.save),
               label: Text('Crear Usuario'),
             ),
