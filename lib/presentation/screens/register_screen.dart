@@ -60,55 +60,25 @@ class _RegisterForm extends StatelessWidget {
   Widget build(BuildContext context) {
     final registerCubit = context.watch<RegisterCubit>();
     final firstName = registerCubit.state.firstName;
+    final lastName = registerCubit.state.lastName;
     final password = registerCubit.state.password;
+    final email = registerCubit.state.email;
     return Form(
       child: Column(
         children: [
           CustomTextFormField(
             label: 'First Name',
-            // onChanged: (value) {
-            //   registerCubit.firstNameChanged(value);
-            // },
-            onChanged: registerCubit.firstNameChanged, //tambien podemos hacer el onChanged de esta forma
-            errorMessage: firstName.isValid || firstName.isPure
-            ? 'Usuario No válido'
-            : null
-            ,
-            validator: (value) {
-              final characterRegExp =
-                  RegExp(r'.*[!@#$%^&*()_+\-=\[\]{};:\\|,.<>\/?"]+');
-              final numberCaseRegExp = RegExp(r'[0-9]');
-              if (value == null) return 'Campo requerido';
-              if (value.trim().isEmpty) return 'Campo requerido';
-              if (characterRegExp.hasMatch(value))
-                return 'Este campo no admite caracteres especiales';
-              if (numberCaseRegExp.hasMatch(value))
-                return 'Este campo no admite números';
-              if (value.length < 6) return 'Más de 6 letras';
-              return null;
-            },
+            onChanged: registerCubit.firstNameChanged,
+            errorMessage: firstName.errorMessage,
+
           ),
           SizedBox(
             height: 10,
           ),
           CustomTextFormField(
             label: 'Last Name',
-            validator: (value) {
-              final characterRegExp =
-                  RegExp(r'.*[!@#$%^&*()_+\-=\[\]{};:\\|,.<>\/?]+');
-              final numberCaseRegExp = RegExp(r'[0-9]');
-              if (value == null) return 'Campo requerido';
-              if (value.trim().isEmpty) return 'Campo requerido';
-              if (characterRegExp.hasMatch(value))
-                return 'Este campo no admite caracteres especiales';
-              if (numberCaseRegExp.hasMatch(value))
-                return 'Este campo no admite números';
-              if (value.length < 6) return 'Más de 6 letras';
-              return null;
-            },
-            onChanged: (value) {
-              registerCubit.lastNameChanged(value);
-            },
+            onChanged:registerCubit.lastNameChanged,
+            errorMessage: lastName.errorMessage,
           ),
           SizedBox(
             height: 10,
@@ -116,51 +86,19 @@ class _RegisterForm extends StatelessWidget {
           CustomTextFormField(
             label: 'Email',
             hint: ' example@email.com',
-            onChanged: (value) {
-              registerCubit.emailChanged(value);
-            },
-            validator: (value) {
-              final emailRegExp = RegExp(
-                r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-              );
-              if (value!.trim().isEmpty) return 'Campo requerido';
-              if (!emailRegExp.hasMatch(value))
-                return 'No tiene formato de correo: example@email.com';
+            onChanged: registerCubit.emailChanged,
+            errorMessage: email.errorMessage,
 
-              return null;
-            },
           ),
           SizedBox(
             height: 10,
           ),
           CustomTextFormField(
-            label: 'Password',
-            // obscureText: true,
-            onChanged: (value) {
-              registerCubit.passwordChanged(value);
-            },
-            validator: (value) {
-              // pass = value;
-              final characterRegExp =
-                  RegExp(r'.*[!@#$%^&*()_+\-=\[\]{};:\\|,.<>\/?]+');
-              final lowerCaseRegExp = RegExp(r'[a-z]');
-              final upperCaseRegExp = RegExp(r'[A-Z]');
-              final numberCaseRegExp = RegExp(r'[0-9]');
+            label: 'Password ${password.value}',
+            obscureText: true,
+            onChanged: registerCubit.passwordChanged,
+            errorMessage: password.errorMessage,
 
-              if (value!.trim().isEmpty) return 'Campo requerido';
-              if (value.length < 8) {
-                return 'La contraseña ebe contener 8 o más caracteres';
-              }
-              if (!upperCaseRegExp.hasMatch(value))
-                return 'Debe contener al menos 1 letra Mayúscula';
-              if (!lowerCaseRegExp.hasMatch(value))
-                return 'Debe contener al menos 1 letra minúscula';
-              if (!numberCaseRegExp.hasMatch(value))
-                return 'Debe contener al menos 1 número';
-              if (!characterRegExp.hasMatch(value))
-                return 'Debe contener al menos 1 caracter especial';
-              return null;
-            },
           ),
           SizedBox(
             height: 10,
@@ -175,15 +113,15 @@ class _RegisterForm extends StatelessWidget {
             //   );
             //   _formKey.currentState?.validate();
             // },
-            validator: (value) {
-              // Validamos que las contraseñas coincidan
-              if (value != registerCubit.state.password) {
-                return 'Las contraseñas no coinciden';
-              }
-              return null;
-            },
+            // validator: (value) {
+            //   // Validamos que las contraseñas coincidan
+            //   if (value != registerCubit.state.password) {
+            //     return 'Las contraseñas no coinciden';
+            //   }
+            //   return null;
+            // },
           ),
-            SizedBox(
+          SizedBox(
             height: 20,
           ),
           // if (!registerCubit.state.isPasswordMatching)
@@ -206,11 +144,15 @@ class _RegisterForm extends StatelessWidget {
           //     label: Text('Crear Usuario'),
           //   ),
           FilledButton.tonalIcon(
-              onPressed: () => registerCubit.onSubmit(),
-              icon: Icon(Icons.save),
-              label: Text('Crear Usuario'),
-            ),
-        
+            onPressed: () {
+          
+              registerCubit.onSubmit();
+
+            },
+            icon: Icon(Icons.save),
+            label: Text('Crear Usuario'),
+          ),
+
           SizedBox(
             height: 20,
           ),
